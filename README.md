@@ -1,16 +1,26 @@
-# Advertiser Analytics API  
-A lightweight FastAPI microservice that exposes revenue, order, customer, and time-series insights through clean REST endpoints. This project extends my original ETL pipeline by transforming the processed dataset into a production-style analytics API — similar to what a Data Engineer or SWE builds for internal dashboards or reporting systems.
+# ⭐ Advertiser Analytics API — FastAPI Microservice
+A lightweight analytics microservice that exposes advertiser revenue, order volume, customer activity, trends, and predictions through clean REST APIs. Built with FastAPI, pandas, and scikit-learn, this project transforms a cleaned advertiser dataset into a real backend analytics service.
 
 ---
 
 ## 🚀 Features
-- Daily, weekly, monthly revenue trends  
-- Top advertisers by revenue  
-- Summary metrics (revenue, orders, customers)  
-- Revenue forecasting (Linear Regression)  
-- Auto-cleaning and renaming of raw CSV columns  
-- REST API with FastAPI + Uvicorn  
-- Fully modular and deploy-ready  
+- Loads & cleans advertiser data from CSV  
+- Computes metrics (revenue, orders, customers)  
+- Identifies top advertisers  
+- Generates daily/weekly/monthly revenue trends  
+- Predicts future revenue using linear regression  
+- Clean, professional FastAPI project structure  
+- Uses virtual environment + requirements.txt  
+
+---
+
+## 🛠️ Tech Stack
+- Python 3.13  
+- FastAPI  
+- Uvicorn  
+- Pandas  
+- NumPy  
+- scikit-learn  
 
 ---
 
@@ -19,59 +29,78 @@ A lightweight FastAPI microservice that exposes revenue, order, customer, and ti
 advertiser-analytics-api/
 │
 ├── app/
-│   ├── main.py                 # FastAPI application
+│   ├── main.py               # FastAPI app + endpoints
 │   └── __init__.py
 │
 ├── data/
-│   └── advertisers_clean.csv   # Cleaned dataset from ETL project
+│   └── advertisers_clean.csv # Cleaned dataset
 │
-├── venv/                       # Virtual environment
-├── requirements.txt            # Dependencies
+├── venv/                     # ignored by git
+│
+├── .gitignore
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-# 🧠 Architecture Diagram
-
+## 🧠 Architecture Diagram
 ```mermaid
 flowchart TD
 
-    A[Cleaned CSV Dataset\n(advertisers_clean.csv)] --> B[FastAPI App\n(main.py)]
-    B --> C[Data Loader\n(pandas)]
-    C --> D[Analytics Layer\n(groupby, resample, ML)]
-    D --> E[REST Endpoints]
+    A["Cleaned CSV Dataset<br/>advertisers_clean.csv"] --> B["FastAPI App<br/>main.py"]
+    B --> C["Data Loader<br/>pandas"]
+    C --> D["Analytics Layer<br/>groupby, resample, ML"]
+    D --> E["REST API Endpoints"]
 
-    E --> F[/summary/]
-    E --> G[/top_advertisers/]
-    E --> H[/trend/]
-    E --> I[/predict/]
+    E --> F["GET /summary"]
+    E --> G["GET /top_advertisers"]
+    E --> H["GET /trend"]
+    E --> I["GET /predict"]
 
-    style A fill:#f8d568,stroke:#b8860b,stroke-width:2px
+    style A fill:#f8d568,stroke:#88680b,stroke-width:2px
     style B fill:#8ec5fc,stroke:#4682b4,stroke-width:2px
-    style D fill:#b5e8c2,stroke:#228b22,stroke-width:2px
-    style E fill:#f7b2d9,stroke:#b03060,stroke-width:2px
+    style C fill:#b5e8c8,stroke:#2e8b57,stroke-width:2px
+    style D fill:#f6d7fa,stroke:#8b3a9e,stroke-width:2px
+    style E fill:#ffffff,stroke:#000000,stroke-width:2px
 ```
 
 ---
 
-# 📊 API Endpoints
+## ▶️ How to Run Locally
 
-## 🔹 `GET /health`
-Returns schema + row count  
-```json
-{
-  "status": "ok",
-  "rows": 68798,
-  "columns": ["advertiser","date","spend","orders","customers"]
-}
+### 1️⃣ Create & activate virtual environment
 ```
+python -m venv venv
+venv\Scripts\activate
+```
+
+### 2️⃣ Install dependencies
+```
+pip install -r requirements.txt
+```
+
+### 3️⃣ Start the API server
+```
+uvicorn app.main:app --reload
+```
+
+### 4️⃣ Open in browser
+- Swagger API docs → http://127.0.0.1:8000/docs  
+- Redoc → http://127.0.0.1:8000/redoc  
 
 ---
 
-## 🔹 `GET /summary`
-Overall metrics  
-```json
+## 📡 API Endpoints
+
+### 🔹 Health Check  
+`GET /health`  
+Returns dataset info (rows, columns, status).
+
+### 🔹 Summary KPIs  
+`GET /summary`  
+Example:
+```
 {
   "total_revenue": 18923492.19,
   "total_orders": 482399,
@@ -79,33 +108,22 @@ Overall metrics
 }
 ```
 
----
+### 🔹 Top Advertisers  
+`GET /top_advertisers?limit=5`  
+Returns advertisers ranked by total revenue.
 
-## 🔹 `GET /top_advertisers?limit=5`
-Top advertisers by revenue  
-```json
-[
-  {"advertiser": 1023, "spend": 923421.91},
-  {"advertiser": 502, "spend": 812399.33}
-]
+### 🔹 Revenue Trend  
+`GET /trend?freq=D`  
+- D = daily  
+- W = weekly  
+- M = monthly  
+
+### 🔹 Revenue Prediction  
+`GET /predict?days=7`  
+Predicts future revenue using linear regression.
+
+Example:
 ```
-
----
-
-## 🔹 `GET /trend?freq=D`
-Daily/Weekly/Monthly trend  
-```json
-[
-  {"date": "2017-01-01", "spend": 11234.11},
-  {"date": "2017-01-02", "spend": 9981.33}
-]
-```
-
----
-
-## 🔹 `GET /predict?days=7`
-7–30 day revenue forecasting  
-```json
 [
   {"date": "2024-02-10", "predicted_revenue": 12231.44},
   {"date": "2024-02-11", "predicted_revenue": 11982.01}
@@ -114,59 +132,14 @@ Daily/Weekly/Monthly trend
 
 ---
 
-# ⚙️ Installation & Setup
-
-### 1️⃣ Clone the repository
-```bash
-git clone https://github.com/<your-username>/advertiser-analytics-api.git
-cd advertiser-analytics-api
-```
-
-### 2️⃣ Create virtual environment
-```bash
-python -m venv venv
-```
-
-### 3️⃣ Activate it
-```bash
-.\venv\Scripts\activate
-```
-
-### 4️⃣ Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 5️⃣ Start API server
-```bash
-uvicorn app.main:app --reload
-```
-
-### 6️⃣ Open API documentation  
-👉 http://127.0.0.1:8000/docs  
+## 🚀 Future Improvements
+- Deploy to Render / Railway / AWS  
+- Add authentication / API keys  
+- Add richer forecasting models  
+- Add visualization endpoints  
+- Add Postgres or Snowflake backend integration  
 
 ---
 
-# 📈 Tech Stack
-- Python 3.11  
-- FastAPI  
-- Uvicorn  
-- Pandas  
-- NumPy  
-- scikit-learn  
-- Mermaid.js  
-
----
-
-# 🎯 Purpose
-This project demonstrates how to:
-- Convert an ETL pipeline into a scalable API  
-- Serve analytics + ML forecasting through REST endpoints  
-- Build real-world data engineering services  
-- Structure production-ready Python projects  
-
----
-
-# 👤 Author
-**Errol Brown**  
-Data Engineering • Analytics • Python • FastAPI  
+## 📄 License
+MIT License
