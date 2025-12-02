@@ -1,4 +1,9 @@
 # ⭐ Advertiser Analytics API — FastAPI Microservice
+🌍 Live API Access  
+➡️ Swagger UI → https://advertiser-analytics-api.onrender.com/docs  
+➡️ Health Check → https://advertiser-analytics-api.onrender.com/health  
+➡️ Top Advertisers → https://advertiser-analytics-api.onrender.com/top_advertisers
+
 A lightweight analytics microservice that exposes advertiser revenue, order volume, customer activity, trends, and predictions through clean REST APIs. Built with FastAPI, pandas, and scikit-learn, this project transforms a cleaned advertiser dataset into a real backend analytics service.
 
 ---
