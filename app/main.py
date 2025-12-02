@@ -7,13 +7,21 @@ from sklearn.linear_model import LinearRegression
 
 app = FastAPI()
 
+# 👉 NEW ROOT ENDPOINT
+@app.get("/")
+def root():
+    return {
+        "status": "API is running! 🎉",
+        "docs": "/docs",
+        "message": "Welcome to the Advertiser Analytics API 🚀"
+    }
+
 # Path to your CSV file
 DATA_FILE = Path(__file__).parent.parent / "data" / "advertisers_clean.csv"
 
 def load_data():
     df = pd.read_csv(DATA_FILE)
 
-    # ---- RENAME YOUR COLUMNS TO MATCH API EXPECTATIONS ----
     rename_map = {
         "order_date": "date",
         "advertiser_id": "advertiser",
@@ -22,11 +30,9 @@ def load_data():
 
     df.rename(columns=rename_map, inplace=True)
 
-    # Convert date column
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
-    # Ensure numeric fields
     for col in ["spend", "orders", "customers"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
@@ -35,7 +41,6 @@ def load_data():
 
 df = load_data()
 
-
 @app.get("/health")
 def health():
     return {
@@ -43,7 +48,6 @@ def health():
         "rows": len(df),
         "columns": df.columns.tolist()
     }
-
 
 @app.get("/summary")
 def summary():
@@ -60,7 +64,6 @@ def summary():
 
     return out
 
-
 @app.get("/top_advertisers")
 def top_advertisers(limit: int = Query(5, ge=1, le=50)):
     if not {"advertiser", "spend"}.issubset(df.columns):
@@ -74,7 +77,6 @@ def top_advertisers(limit: int = Query(5, ge=1, le=50)):
     )
 
     return temp.to_dict(orient="records")
-
 
 @app.get("/trend")
 def trend(freq: str = Query("D", regex="^(D|W|M)$")):
@@ -91,7 +93,6 @@ def trend(freq: str = Query("D", regex="^(D|W|M)$")):
 
     series["date"] = series["date"].dt.strftime("%Y-%m-%d")
     return series.to_dict(orient="records")
-
 
 @app.get("/predict")
 def predict(days: int = Query(7, ge=1, le=30)):
